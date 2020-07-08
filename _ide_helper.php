@@ -3,7 +3,7 @@
 
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.7.29 on 2020-07-06 15:16:43.
+ * Generated for Laravel 5.7.29 on 2020-07-08 15:14:47.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -14405,6 +14405,18 @@ namespace Illuminate\Support\Facades {
  
 }
 
+namespace App\Helpers { 
+
+    /**
+     * 
+     *
+     */ 
+    class JwtAuth {
+         
+    }
+ 
+}
+
 
 namespace  { 
 
@@ -17012,6 +17024,8 @@ namespace  {
     class Validator extends \Illuminate\Support\Facades\Validator {}
 
     class View extends \Illuminate\Support\Facades\View {}
+
+    class JwtAuth extends \App\Helpers\JwtAuth {}
  
 }
 
