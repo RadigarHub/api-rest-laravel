@@ -13,24 +13,52 @@ class UserController extends Controller
     public function register(Request $request) {
         // Recoger los datos del usuario por post. Ej: {"name":"Rafael", "surname":"Díaz", "email":"rafa@rafa.com", "password":"rafa"}
         $json = $request->input('json', null);
-        // $params = json_decode($json); // objeto
-        $params = json_decode($json, true); // array
+        $params = json_decode($json, true); // Con el true se devuelve un array en vez de un objeto
 
-        // Validar los datos
+        // Comprobar si los datos se reciben en un formato correcto
+        if (! empty($params)){
+            
+            // Limpiar los datos
+            $params = array_map('trim', $params);
 
-        // Cifrar la contraseña
+            // Validar los datos y comprobar si el usuario ya existe (duplicado)
+            $validate = \Validator::make($params, [
+                'name'      => 'required|alpha',
+                'surname'   => 'required|alpha',
+                'email'     => 'required|email|unique:users',
+                'password'  => 'required'
+            ]);
 
-        // Comprobar si el usuario ya existe (duplicado)
+            if ($validate->fails()) {
+                $data = array(
+                    'status' => 'error',
+                    'code' => 404,
+                    'messsage' => 'El usuario no se ha creado',
+                    'errors' => $validate->errors()
+                );
+            } else {
+                $data = array(
+                    'status' => 'success',
+                    'code' => 200,
+                    'messsage' => 'El usuario se ha creado correctamente'
+                );
 
-        // Crear el usuario
+                // Cifrar la constraseña
 
+                // Crear el usuario
+
+                // Guardar el usuario en la BD
+            }
+
+        } else {
+            $data = array(
+                'status' => 'error',
+                'code' => 404,
+                'messsage' => 'Los datos enviados no son correctos'
+            );
+        }
+        
         // Devolver un mensaje indicando el resultado
-
-        $data = array(
-            'status' => 'error',
-            'code' => 404,
-            'messsage' => 'El usuario no se ha creado'
-        );
         return response()->json($data, $data['code']);
     }
 
