@@ -11,7 +11,10 @@ class UserController extends Controller
     }
 
     public function register(Request $request) {
-        // Recoger los datos del usuario por post
+        // Recoger los datos del usuario por post. Ej: {"name":"Rafael", "surname":"Díaz", "email":"rafa@rafa.com", "password":"rafa"}
+        $json = $request->input('json', null);
+        // $params = json_decode($json); // objeto
+        $params = json_decode($json, true); // array
 
         // Validar los datos
 
