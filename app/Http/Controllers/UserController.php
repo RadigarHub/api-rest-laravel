@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
 
 class UserController extends Controller
 {
@@ -37,17 +38,26 @@ class UserController extends Controller
                     'errors' => $validate->errors()
                 );
             } else {
+                // Cifrar la contraseña
+                $pwd = password_hash($params['password'], PASSWORD_BCRYPT, ['cost' => 4]);
+
+                // Crear el usuario
+                $user = new User();
+                $user->name = $params['name'];
+                $user->surname = $params['surname'];
+                $user->email = $params['email'];
+                $user->password = $pwd;
+                $user->role = 'ROLE_USER';
+
+                // Guardar el usuario en la BD
+                $user->save();
+
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
-                    'messsage' => 'El usuario se ha creado correctamente'
+                    'messsage' => 'El usuario se ha creado correctamente',
+                    'user' => $user
                 );
-
-                // Cifrar la constraseña
-
-                // Crear el usuario
-
-                // Guardar el usuario en la BD
             }
 
         } else {
