@@ -126,12 +126,48 @@ class UserController extends Controller
         $jwtAuth = new \JwtAuth();
         $checkToken = $jwtAuth->checkToken($token);
 
-        if ($checkToken) {
-            echo "<h1>Login correcto</h1>";
+        // Recoger los datos por POST
+        $json = $request->input('json', null);
+        $params = json_decode($json, true);
+
+        if ($checkToken && !empty($params)) {
+            // Obtener el usuario identificado
+            $user = $jwtAuth->checkToken($token, true);
+
+            // Validar los datos
+            $validate = \Validator::make($params, [
+                'name'      => 'required|alpha',
+                'surname'   => 'required|alpha',
+                'email'     => 'required|email|unique:users,'.$user->sub // El validator comprueba que el email no se repita salvo para el mismo usuario que se está actualizando
+            ]);
+
+            // Quitar los campos que no se quieren actualizar
+            foreach ($params as $key => $val) {
+                if (!in_array($key, ['name', 'surname', 'email', 'description', 'image', 'updated_at'])) {
+                    unset($params[$key]);
+                }
+            }
+
+            // Actualizar usuario en la BD
+            $user_update = User::where('id', $user->sub)->update($params);
+
+            // Devolver el resultado
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'user' => $user,
+                'changes' => $params
+            );
+
         } else {
-            echo "<h1>Login INCORRECTO</h1>";
+            // Devolver mensaje de error
+            $data = array(
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'El usuario no está identificado'
+            );
         }
 
-        die();
+        return response()->json($data, $data['code']);
     }
 }
