@@ -14,7 +14,7 @@ class JwtAuth
         $this->key = 'esto_es_una_clave_super_secreta-99887766';
     }
 
-    public function signup($email, $password, $getData = null) {
+    public function signup($email, $password, $getIdentity = false) {
         // Buscar si existe el usuario con sus credenciales
         $user = User::where([
             'email' => $email,
@@ -42,10 +42,10 @@ class JwtAuth
             $decode = JWT::decode($jwt, $this->key, array('HS256'));
 
             // Devolver los datos decodificados o el token, en función de un parámetro
-            if (is_null($getData)) {
-                $data = $jwt;
-            } else {
+            if ($getIdentity) {
                 $data = $decode;
+            } else {
+                $data = $jwt;
             }
 
         } else {
@@ -56,5 +56,28 @@ class JwtAuth
         }
 
         return $data;
+    }
+
+    public function checkToken($jwt, $getIdentity = false) {
+        $auth = false;
+
+        try {
+            $jwt = str_replace('"', '', $jwt);
+            $decoded = JWT::decode($jwt, $this->key, array('HS256'));
+        } catch(\UnexpectedValueException $e) {
+            $auth = false;
+        } catch(\DomainException $e) {
+            $auth = false;
+        }
+
+        if (!empty($decoded) && is_object($decoded) && isset($decoded->sub)) {
+            $auth = true;
+        }
+
+        if ($getIdentity) {
+            return $decoded;
+        }
+
+        return $auth;
     }
 }
