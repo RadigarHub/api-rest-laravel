@@ -75,10 +75,48 @@ class UserController extends Controller
     public function login(Request $request) {
         $jwtAuth = new \JwtAuth();
 
-        $email = 'rafa@rafa.com';
-        $password = 'rafa';
-        $pwd = hash('sha256', $password);
+        // Recibir los datos por POST
+        $json = $request->input('json', null);
+        $params = json_decode($json, true);
 
-        return response()->json($jwtAuth->signup($email, $pwd), 200);
+        // Comprobar si los datos se reciben en un formato correcto
+        if (! empty($params)){
+            // Validar los datos
+            $validate = \Validator::make($params, [
+                'email'     => 'required|email',
+                'password'  => 'required'
+            ]);
+
+            if ($validate->fails()) {
+                $signup = array(
+                    'status' => 'error',
+                    'code' => 404,
+                    'messsage' => 'El usuario no se ha podido identificar',
+                    'errors' => $validate->errors()
+                );
+                $code = 404;
+            } else {
+                // Cifrar la password
+                $pwd = hash('sha256', $params['password']);
+
+                // Devolver token o datos
+                $signup = $jwtAuth->signup($params['email'], $pwd);
+                
+                if (!empty($params['getData'])) {
+                    $signup = $jwtAuth->signup($params['email'], $pwd, true);
+                }
+                $code = 200;
+            }
+        } else {
+            $signup = array(
+                'status' => 'error',
+                'code' => 404,
+                'messsage' => 'Los datos enviados no son correctos'
+            );
+            $code = 404;
+        }
+
+        // Devolver una respuesta
+        return response()->json($signup, $code);
     }
 }
