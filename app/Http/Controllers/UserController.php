@@ -138,26 +138,35 @@ class UserController extends Controller
             $validate = \Validator::make($params, [
                 'name'      => 'required|alpha',
                 'surname'   => 'required|alpha',
-                'email'     => 'required|email|unique:users,'.$user->sub // El validator comprueba que el email no se repita salvo para el mismo usuario que se está actualizando
+                'email'     => 'required|email|unique:users,email,'.$user->sub // El validator comprueba que el email no se repita salvo para el mismo usuario que se está actualizando
             ]);
 
-            // Quitar los campos que no se quieren actualizar
-            foreach ($params as $key => $val) {
-                if (!in_array($key, ['name', 'surname', 'email', 'description', 'image', 'updated_at'])) {
-                    unset($params[$key]);
+            if ($validate->fails()) {
+                // Devolver mensaje de error
+                $data = array(
+                    'code' => 400,
+                    'status' => 'error',
+                    'message' => 'El usuario no está identificado'
+                );
+            } else {
+                // Quitar los campos que no se quieren actualizar
+                foreach ($params as $key => $val) {
+                    if (!in_array($key, ['name', 'surname', 'email', 'description', 'image', 'updated_at'])) {
+                        unset($params[$key]);
+                    }
                 }
+
+                // Actualizar usuario en la BD
+                $user_update = User::where('id', $user->sub)->update($params);
+
+                // Devolver el resultado
+                $data = array(
+                    'code' => 200,
+                    'status' => 'success',
+                    'user' => $user,
+                    'changes' => $params
+                );
             }
-
-            // Actualizar usuario en la BD
-            $user_update = User::where('id', $user->sub)->update($params);
-
-            // Devolver el resultado
-            $data = array(
-                'code' => 200,
-                'status' => 'success',
-                'user' => $user,
-                'changes' => $params
-            );
 
         } else {
             // Devolver mensaje de error
