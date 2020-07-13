@@ -129,12 +129,13 @@ class PostController extends Controller
                 }
 
                 // Actualizar entrada en la BD
-                $post = Post::where('id', $id)->update($params);
+                $post = Post::where('id', $id)->updateOrCreate($params); // El método updateOrCreate actualiza o crea un objeto y lo devuelve como resultado
 
                 $data = array (
                     'code' => 200,
                     'status' => 'success',
-                    'post' => $params
+                    'post' => $post,
+                    'changes' => $params
                 );
             }
                 
