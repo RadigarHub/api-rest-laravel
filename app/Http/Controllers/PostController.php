@@ -45,4 +45,58 @@ class PostController extends Controller
 
         return response()->json($data, $data['code']);
     }
+
+    public function store(Request $request) {
+        // Recoger los datos por post
+        $json = $request->input('json', null);
+        $params = json_decode($json, true);
+
+        if (! empty($params)){
+            // Conseguir el usuario identificado
+            $jwtAuth = new \JwtAuth();
+            $token = $request->header('Authorization', null);
+            $user = $jwtAuth->checkToken($token, true);
+
+            // Validar los datos
+            $validate = \Validator::make($params, [
+                'title' => 'required',
+                'content' => 'required',
+                'category_id' => 'required',
+                'image' => 'required'
+            ]);
+
+            if ($validate->fails()) {
+                $data = array (
+                    'code' => 400,
+                    'status' => 'error',
+                    'message' => 'No se ha guardado el post, faltan datos'
+                );
+            } else {
+                // Guardar la entrada
+                $post = new Post();
+                $post->user_id = $user->sub;
+                $post->category_id = $params['category_id'];
+                $post->title = $params['title'];
+                $post->content = $params['content'];
+                $post->image = $params['image'];
+                $post->save();
+
+                $data = array (
+                    'code' => 200,
+                    'status' => 'success',
+                    'post' => $post
+                );
+            }
+
+        } else {
+            $data = array (
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'No se han enviado los datos correctamente'
+            );
+        }
+
+        // Devolver el resultado
+        return response()->json($data, $data['code']);
+    }
 }
