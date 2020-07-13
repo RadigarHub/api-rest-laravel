@@ -22,4 +22,24 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function show($id) {
+        $category = Category::find($id);
+
+        if (is_object($category)) {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'category' => $category
+            );
+        } else {
+            $data = array(
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'La categoría no existe'
+            );
+        }
+
+        return response()->json($data, $data['code']);
+    }
+    
 }
