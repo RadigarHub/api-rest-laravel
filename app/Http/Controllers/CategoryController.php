@@ -8,6 +8,10 @@ use App\Category;
 
 class CategoryController extends Controller
 {
+    public function __construct() {
+        $this->middleware('api.auth', ['except' => ['index', 'show']]);
+    }
+
     public function pruebas(Request $request) {
         return "Acción de pruebas de CATEGORY-CONTROLLER";
     }
@@ -41,5 +45,45 @@ class CategoryController extends Controller
 
         return response()->json($data, $data['code']);
     }
-    
+
+    public function store(Request $request) {
+        // Recoger los datos por post
+        $json = $request->input('json', null);
+        $params = json_decode($json, true);
+
+        if (! empty($params)){
+            // Validar los datos
+            $validate = \Validator::make($params, [
+                'name' => 'required|unique:categories'
+            ]);
+
+            // Guardar la categoría
+            if ($validate->fails()) {
+                $data = array (
+                    'code' => 400,
+                    'status' => 'error',
+                    'message' => 'No se ha guardado la categoría'
+                );
+            } else {
+                $category = new Category();
+                $category->name = $params['name'];
+                $category->save();
+                
+                $data = array (
+                    'code' => 200,
+                    'status' => 'success',
+                    'category' => $category
+                );
+            }
+        } else {
+            $data = array (
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'No has enviado ninguna categoría'
+            );
+        }
+
+        // Devolver el resultado
+        return response()->json($data, $data['code']);
+    }
 }
