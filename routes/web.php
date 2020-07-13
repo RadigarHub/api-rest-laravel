@@ -62,3 +62,6 @@ Route::get('/test-orm', 'PruebasController@testOrm');
 
     // Rutas del controlador de categorías (Usando el resource se crean muchas rutas automáticamente)
     Route::resource('/api/category', 'CategoryController');
+
+    // Rutas del controlador de entradas
+    Route::resource('/api/post', 'PostController');
