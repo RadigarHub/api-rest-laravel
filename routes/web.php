@@ -42,12 +42,15 @@ Route::get('/test-orm', 'PruebasController@testOrm');
      *   POST: Guardar datos o recursos o hacer logica desde formulario
      *   PUT: Actualizar recursos o datos
      *   DELETE: Eliminar datos o recursos
+     * 
+     * Commando por terminal para ver todas las rutas creadas:
+     *   php artisan route:list
      */
 
     // Rutas de prueba
-    Route::get('/usuario/pruebas', 'UserController@pruebas');
-    Route::get('/categoria/pruebas', 'CategoryController@pruebas');
-    Route::get('/entrada/pruebas', 'PostController@pruebas');
+    //Route::get('/usuario/pruebas', 'UserController@pruebas');
+    //Route::get('/categoria/pruebas', 'CategoryController@pruebas');
+    //Route::get('/entrada/pruebas', 'PostController@pruebas');
 
     // Rutas del controlador de usuarios
     Route::post('/api/register', 'UserController@register');
@@ -56,3 +59,6 @@ Route::get('/test-orm', 'PruebasController@testOrm');
     Route::post('/api/user/upload','UserController@upload')->middleware('api.auth');
     Route::get('/api/user/avatar/{filename}', 'UserController@getImage');
     Route::get('api/user/detail/{id}', 'UserController@detail');
+
+    // Rutas del controlador de categorías (Usando el resource se crean muchas rutas automáticamente)
+    Route::resource('/api/category', 'CategoryController');
