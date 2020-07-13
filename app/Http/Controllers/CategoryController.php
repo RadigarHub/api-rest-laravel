@@ -98,22 +98,30 @@ class CategoryController extends Controller
                 'name' => 'required|unique:categories,name,'.$id // El validator comprueba que el nombre no se repita salvo para la misma categoría que se está actualizando
             ]);
 
-            // Quitar los campos que no se quieren actualizar
-            foreach ($params as $key => $val) {
-                if (!in_array($key, ['name', 'updated_at'])) {
-                    unset($params[$key]);
+            if ($validate->fails()) {
+                $data = array (
+                    'code' => 400,
+                    'status' => 'error',
+                    'message' => 'No se ha actualizado la categoría'
+                );
+            } else {
+                // Quitar los campos que no se quieren actualizar
+                foreach ($params as $key => $val) {
+                    if (!in_array($key, ['name', 'updated_at'])) {
+                        unset($params[$key]);
+                    }
                 }
+
+                // Actualizar categoría en la BD
+                $category = Category::where('id', $id)->update($params);
+
+                $data = array (
+                    'code' => 200,
+                    'status' => 'success',
+                    'category' => $params
+                );
             }
-
-            // Actualizar categoría en la BD
-            $category = Category::where('id', $id)->update($params);
-
-            $data = array (
-                'code' => 200,
-                'status' => 'success',
-                'category' => $params
-            );
-
+            
         } else {
             $data = array (
                 'code' => 400,
