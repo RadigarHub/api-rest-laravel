@@ -99,4 +99,54 @@ class PostController extends Controller
         // Devolver el resultado
         return response()->json($data, $data['code']);
     }
+
+    public function update($id, Request $request) {
+        // Recoger los datos por post
+        $json = $request->input('json', null);
+        $params = json_decode($json, true);
+
+        if (! empty($params)) {
+            // Validar los datos
+            $validate = \Validator::make($params, [
+                'title' => 'required',
+                'content' => 'required',
+                'category_id' => 'required',
+                'image' => 'required'
+            ]);
+
+            if ($validate->fails()) {
+                $data = array (
+                    'code' => 400,
+                    'status' => 'error',
+                    'message' => 'No se ha actualizado la entrada'
+                );
+            } else {
+                // Quitar los campos que no se quieren actualizar
+                foreach ($params as $key => $val) {
+                    if (!in_array($key, ['title', 'content', 'category_id', 'image', 'updated_at'])) {
+                        unset($params[$key]);
+                    }
+                }
+
+                // Actualizar entrada en la BD
+                $post = Post::where('id', $id)->update($params);
+
+                $data = array (
+                    'code' => 200,
+                    'status' => 'success',
+                    'post' => $params
+                );
+            }
+                
+        } else {
+            $data = array (
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'No has enviado ninguna entrada'
+            );
+        }
+        
+        // Devolver el resultado
+        return response()->json($data, $data['code']);
+    }
 }
