@@ -53,9 +53,7 @@ class PostController extends Controller
 
         if (! empty($params)){
             // Conseguir el usuario identificado
-            $jwtAuth = new \JwtAuth();
-            $token = $request->header('Authorization', null);
-            $user = $jwtAuth->checkToken($token, true);
+            $user = $this->getIdentity($request);
 
             // Validar los datos
             $validate = \Validator::make($params, [
@@ -128,15 +126,40 @@ class PostController extends Controller
                     }
                 }
 
-                // Actualizar entrada en la BD
-                $post = Post::where('id', $id)->updateOrCreate($params); // El método updateOrCreate actualiza o crea un objeto y lo devuelve como resultado
+                // Conseguir el usuario identificado
+                $user = $this->getIdentity($request);
 
-                $data = array (
-                    'code' => 200,
-                    'status' => 'success',
-                    'post' => $post,
-                    'changes' => $params
-                );
+                 // Buscar la entrada y ver si existe
+                $post = Post::where('id', $id)
+                            ->where('user_id', $user->sub)
+                            ->first();
+
+                if (!empty($post) && is_object($post)) {
+                    // Actualizar entrada en la BD
+                    $post->update($params);
+
+                    /*
+                    $where = array(
+                        'id' => $id,
+                        'user_id' => $user->sub
+                    );
+                    $post = Post::updateOrCreate($where, $params); // El método updateOrCreate actualiza o crea un objeto y lo devuelve como resultado
+                    */
+
+                    $data = array (
+                        'code' => 200,
+                        'status' => 'success',
+                        'post' => $post,
+                        'changes' => $params
+                    );
+
+                } else {
+                    $data = array (
+                        'code' => 400,
+                        'status' => 'error',
+                        'message' => 'La entrada no existe'
+                    );
+                }
             }
                 
         } else {
@@ -152,8 +175,13 @@ class PostController extends Controller
     }
 
     public function destroy($id, Request $request) {
+        // Conseguir el usuario identificado
+        $user = $this->getIdentity($request);
+
         // Conseguir la entrada
-        $post = Post::find($id);
+        $post = Post::where('id', $id)
+                    ->where('user_id', $user->sub)
+                    ->first();
 
         // Comprobar que el objeto existe
         if (is_object($post)) {
@@ -175,5 +203,13 @@ class PostController extends Controller
         
         // Devolver el resultado
         return response()->json($data, $data['code']);
+    }
+
+    private function getIdentity(Request $request) {
+        // Conseguir el usuario identificado
+        $jwtAuth = new \JwtAuth();
+        $token = $request->header('Authorization', null);
+        $user = $jwtAuth->checkToken($token, true);
+        return $user;
     }
 }
