@@ -13,7 +13,13 @@ class PostController extends Controller
     }
 
     public function __construct() {
-        $this->middleware('api.auth', ['except' => ['index', 'show', 'getImage']]);
+        $this->middleware('api.auth', ['except' => [
+            'index', 
+            'show', 
+            'getImage', 
+            'getPostsByCategory', 
+            'getPostsByUser'
+        ]]);
     }
 
     public function index() {
@@ -264,5 +270,45 @@ class PostController extends Controller
             );
             return response()->json($data, $data['code']);
         }
+    }
+
+    public function getPostsByCategory($id) {
+        $posts = Post::where('category_id', $id)->get();
+
+        if (!$posts->isEmpty()) {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'posts' => $posts
+            );
+        } else {
+            $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'No existen posts para esta categoría'
+            );
+        }
+
+        return response()->json($data, $data['code']);
+    }
+
+    public function getPostsByUser($id) {
+        $posts = Post::where('user_id', $id)->get();
+
+        if (!$posts->isEmpty()) {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'posts' => $posts
+            );
+        } else {
+            $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'No existen posts para este usuario'
+            );
+        }
+
+        return response()->json($data, $data['code']);
     }
 }
