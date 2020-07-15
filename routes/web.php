@@ -58,7 +58,7 @@ Route::get('/test-orm', 'PruebasController@testOrm');
     Route::put('/api/user/update', 'UserController@update');
     Route::post('/api/user/upload','UserController@upload')->middleware('api.auth');
     Route::get('/api/user/avatar/{filename}', 'UserController@getImage');
-    Route::get('api/user/detail/{id}', 'UserController@detail');
+    Route::get('/api/user/detail/{id}', 'UserController@detail');
 
     // Rutas del controlador de categorías (Usando el resource se crean muchas rutas automáticamente)
     Route::resource('/api/category', 'CategoryController');
@@ -66,3 +66,4 @@ Route::get('/test-orm', 'PruebasController@testOrm');
     // Rutas del controlador de entradas
     Route::resource('/api/post', 'PostController');
     Route::post('/api/post/upload','PostController@upload');
+    Route::get('/api/post/image/{filename}', 'PostController@getImage');
