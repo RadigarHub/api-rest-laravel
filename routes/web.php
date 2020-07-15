@@ -52,21 +52,26 @@ Route::get('/test-orm', 'PruebasController@testOrm');
     //Route::get('/categoria/pruebas', 'CategoryController@pruebas');
     //Route::get('/entrada/pruebas', 'PostController@pruebas');
 
-    // Rutas del controlador de usuarios
-    Route::post('/api/register', 'UserController@register');
-    Route::post('/api/login', 'UserController@login');
-    Route::put('/api/user/update', 'UserController@update');
-    Route::post('/api/user/upload','UserController@upload')->middleware('api.auth');
-    Route::get('/api/user/avatar/{filename}', 'UserController@getImage');
-    Route::get('/api/user/detail/{id}', 'UserController@detail');
+    // Middleware para controlar el acceso CORS
+    Route::group(['middleware' => ['cors']], function () {
 
-    // Rutas del controlador de categorías (Usando el resource se crean muchas rutas automáticamente)
-    Route::resource('/api/category', 'CategoryController');
+        // Rutas del controlador de usuarios
+        Route::post('/api/register', 'UserController@register');
+        Route::post('/api/login', 'UserController@login');
+        Route::put('/api/user/update', 'UserController@update');
+        Route::post('/api/user/upload','UserController@upload')->middleware('api.auth');
+        Route::get('/api/user/avatar/{filename}', 'UserController@getImage');
+        Route::get('/api/user/detail/{id}', 'UserController@detail');
 
-    // Rutas del controlador de entradas
-    Route::resource('/api/post', 'PostController');
-    Route::post('/api/post/upload','PostController@upload');
-    Route::get('/api/post/image/{filename}', 'PostController@getImage');
-    route::get('/api/post/category/{id}', 'PostController@getPostsByCategory');
-    route::get('/api/post/user/{id}', 'PostController@getPostsByUser');
+        // Rutas del controlador de categorías (Usando el resource se crean muchas rutas automáticamente)
+        Route::resource('/api/category', 'CategoryController');
 
+        // Rutas del controlador de entradas
+        Route::resource('/api/post', 'PostController');
+        Route::post('/api/post/upload','PostController@upload');
+        Route::get('/api/post/image/{filename}', 'PostController@getImage');
+        route::get('/api/post/category/{id}', 'PostController@getPostsByCategory');
+        route::get('/api/post/user/{id}', 'PostController@getPostsByUser');
+    
+    });
+    
