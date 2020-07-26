@@ -53,7 +53,7 @@ Route::get('/test-orm', 'PruebasController@testOrm');
     //Route::get('/entrada/pruebas', 'PostController@pruebas');
 
     // Middleware para controlar el acceso CORS
-    Route::group(['middleware' => ['cors']], function () {
+    //Route::group(['middleware' => ['cors']], function () {
 
         // Rutas del controlador de usuarios
         Route::post('/api/register', 'UserController@register');
@@ -73,5 +73,5 @@ Route::get('/test-orm', 'PruebasController@testOrm');
         route::get('/api/post/category/{id}', 'PostController@getPostsByCategory');
         route::get('/api/post/user/{id}', 'PostController@getPostsByUser');
     
-    });
+    //});
     
