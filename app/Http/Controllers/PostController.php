@@ -276,7 +276,7 @@ class PostController extends Controller
     public function getPostsByCategory($id) {
         $posts = Post::where('category_id', $id)->get();
 
-        if (!$posts->isEmpty()) {
+        if ($posts) {
             $data = array(
                 'code' => 200,
                 'status' => 'success',
@@ -296,7 +296,7 @@ class PostController extends Controller
     public function getPostsByUser($id) {
         $posts = Post::where('user_id', $id)->get();
 
-        if (!$posts->isEmpty()) {
+        if ($posts) {
             $data = array(
                 'code' => 200,
                 'status' => 'success',
