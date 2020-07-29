@@ -30,12 +30,14 @@ class JwtAuth
         // Generar el token con los datos del usuario identificado
         if ($signup) {
             $token = array(
-                'sub'       => $user->id,
-                'email'     => $user->email,
-                'name'      => $user->name,
-                'surname'   => $user->surname,
-                'iat'       => time(),  // Momento en que se creó el token
-                'exp'       => time() + (7 * 24 * 60 * 60)  // Momento en el que el token expirará
+                'sub'           => $user->id,
+                'email'         => $user->email,
+                'name'          => $user->name,
+                'surname'       => $user->surname,
+                'description'   => $user->description,
+                'image'         => $user->image,
+                'iat'           => time(),  // Momento en que se creó el token
+                'exp'           => time() + (7 * 24 * 60 * 60)  // Momento en el que el token expirará
             );
 
             $jwt = JWT::encode($token, $this->key, 'HS256');
